@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voice Logger | HealthAI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/glassmorphism.css">
+    <style>
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .nav-item {
+            padding: 1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .nav-item:hover, .nav-item.active {
+            background: rgba(216, 180, 254, 0.2);
+            color: var(--primary);
+        }
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            align-items: center;
+        }
+        .record-btn {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), #C084FC);
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 10px 25px rgba(216, 180, 254, 0.5);
+            transition: transform 0.3s, box-shadow 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            gap: 0.5rem;
+            margin: 3rem auto;
+        }
+        .record-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 15px 35px rgba(216, 180, 254, 0.7);
+        }
+        .record-btn.recording {
+            animation: pulse 1.5s infinite;
+            background: linear-gradient(135deg, #EF4444, #FCA5A5);
+            box-shadow: 0 10px 25px rgba(239, 68, 68, 0.5);
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { transform: scale(1.1); box-shadow: 0 0 0 20px rgba(239, 68, 68, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        }
+        .status-text {
+            font-size: 1.25rem;
+            color: var(--text-dark);
+            font-weight: 500;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <nav class="glass-nav">
+        <div class="container" style="display:flex; justify-content:space-between; align-items:center; padding: 1rem 2rem;">
+            <div style="font-weight:700; font-size:1.25rem; color: var(--primary);">HealthAI</div>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <span style="font-weight: 500;">John Doe</span>
+                <img src="https://ui-avatars.com/api/?name=John+Doe&background=D8B4FE&color=fff" alt="Profile" style="border-radius: 50%; width: 40px; height: 40px;">
+                <a href="index.html" style="font-size: 0.875rem; color: var(--text-light);">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="dashboard-grid">
+            <aside class="sidebar glass-card">
+                <a href="patient-dashboard.html" class="nav-item" style="text-decoration: none; color: inherit; display: block;">Overview</a>
+                <a href="symptom-log.html" class="nav-item" style="text-decoration: none; color: inherit; display: block;">Symptom Log</a>
+                <a href="voice-logger.html" class="nav-item active" style="text-decoration: none; color: inherit; display: block;">Voice Logger</a>
+                <a href="health-reports.html" class="nav-item" style="text-decoration: none; color: inherit; display: block;">Health Reports</a>
+                <a href="appointments.html" class="nav-item" style="text-decoration: none; color: inherit; display: block;">Appointments</a>
+            </aside>
+            
+            <main class="main-content" style="width: 100%;">
+                <div class="glass-card" style="width: 100%; text-align: center; padding: 4rem 2rem;">
+                    <h2 style="margin-top: 0; color: var(--primary);">AI Voice Logger</h2>
+                    <p style="color: var(--text-light); margin-bottom: 2rem;">Simply describe how you're feeling today, and our AI will automatically extract and log your symptoms.</p>
+                    
+                    <button id="recordBtn" class="record-btn" onclick="toggleRecording()">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path>
+                            <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                            <line x1="12" y1="19" x2="12" y2="22"></line>
+                        </svg>
+                        <span id="btnText" style="font-size: 1rem; margin-top: 5px;">Start Recording</span>
+                    </button>
+
+                    <div id="statusText" class="status-text">Click the microphone to begin</div>
+
+                    <div style="margin-top: 2rem; max-width: 500px; margin-left: auto; margin-right: auto;">
+                        <label style="display:block; text-align:left; font-weight:500; margin-bottom:0.5rem; color:var(--text-dark);">Live Transcript (You can also edit this):</label>
+                        <textarea id="transcript" style="width:100%; padding: 1rem; border-radius: 8px; border: 1px solid #ddd; background: rgba(255,255,255,0.5); font-family:inherit;" rows="3" placeholder="Speak into your microphone or type here..."></textarea>
+                        <button id="analyzeBtn" class="btn btn-primary" style="margin-top: 1rem; width: 100%; padding: 0.75rem; font-weight: 600;" onclick="analyzeTranscript()">Analyze & Log Symptoms</button>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = localStorage.getItem('API_URL') || (window.location.origin.includes(':3000') ? 'http://localhost:8000' : window.location.origin);
+        let isRecording = false;
+        let recognition = null;
+        
+        // Initialize Speech Recognition
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            
+            recognition.onresult = function(event) {
+                let finalTranscript = '';
+                
+                for (let i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) {
+                        finalTranscript += event.results[i][0].transcript;
+                    }
+                }
+                
+                const transcriptInput = document.getElementById('transcript');
+                if (finalTranscript) {
+                    transcriptInput.value += finalTranscript + ' ';
+                }
+            };
+            
+            recognition.onerror = function(event) {
+                console.error("Speech recognition error", event.error);
+                document.getElementById('statusText').innerHTML = `<span style="color: #EF4444;">Microphone error: ${event.error}</span>`;
+            };
+        } else {
+            console.warn("Speech recognition not supported in this browser.");
+        }
+        
+        async function toggleRecording() {
+            const btn = document.getElementById('recordBtn');
+            const btnText = document.getElementById('btnText');
+            const statusText = document.getElementById('statusText');
+            const transcriptInput = document.getElementById('transcript');
+            
+            if (!isRecording) {
+                // Start recording
+                isRecording = true;
+                btn.classList.add('recording');
+                btnText.innerText = 'Stop';
+                statusText.innerText = 'Listening... Please speak your symptoms clearly.';
+                transcriptInput.value = ''; // Clear previous input
+                
+                if (recognition) {
+                    try {
+                        recognition.start();
+                    } catch(e) {
+                        console.error("Recognition already started or error:", e);
+                    }
+                } else {
+                    statusText.innerText = 'Speech recognition not supported. Please type your symptoms manually.';
+                }
+            } else {
+                // Stop recording
+                isRecording = false;
+                btn.classList.remove('recording');
+                btnText.innerText = 'Start Recording';
+                statusText.innerHTML = '<span style="color: var(--primary);">Processing text with AI...</span>';
+                
+                if (recognition) {
+                    recognition.stop();
+                }
+                
+                try {
+                    const res = await fetch(`${API_BASE_URL}/api/voice-symptoms`, {
+                        method: 'POST',
+                        headers: {'Content-Type': 'application/json'},
+                        body: JSON.stringify({text: transcriptInput.value})
+                    });
+                    const result = await res.json();
+                    if (res.ok) {
+                        statusText.innerHTML = `<span style="color: #10B981;">Log saved successfully!</span><br><span style="font-size:0.9rem; color:var(--text-dark);">${result.description || ''}</span>`;
+                    } else {
+                        statusText.innerHTML = `<span style="color: #EF4444;">Error: ${result.detail || 'Failed to process'}</span>`;
+                    }
+                } catch(err) {
+                    statusText.innerHTML = '<span style="color: #EF4444;">Failed to connect to backend server.</span>';
+                }
+            }
+        }
+
+        async function analyzeTranscript() {
+            const transcriptInput = document.getElementById('transcript');
+            const text = transcriptInput.value.trim();
+            if (!text) {
+                alert('Please type or record some symptoms first!');
+                return;
+            }
+
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            const statusText = document.getElementById('statusText');
+            
+            // If currently recording, stop it first
+            if (isRecording) {
+                isRecording = false;
+                const recordBtn = document.getElementById('recordBtn');
+                const btnText = document.getElementById('btnText');
+                recordBtn.classList.remove('recording');
+                btnText.innerText = 'Start Recording';
+                if (recognition) {
+                    recognition.stop();
+                }
+            }
+
+            analyzeBtn.disabled = true;
+            analyzeBtn.innerText = 'Analyzing...';
+            statusText.innerHTML = '<span style="color: var(--primary);">Processing text with AI...</span>';
+
+            try {
+                const res = await fetch(`${API_BASE_URL}/api/voice-symptoms`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify({text: text})
+                });
+                const result = await res.json();
+                if (res.ok) {
+                    statusText.innerHTML = `<span style="color: #10B981;">Log saved successfully!</span><br><span style="font-size:0.9rem; color:var(--text-dark);">${result.description || ''}</span>`;
+                } else {
+                    statusText.innerHTML = `<span style="color: #EF4444;">Error: ${result.detail || 'Failed to process'}</span>`;
+                }
+            } catch(err) {
+                statusText.innerHTML = '<span style="color: #EF4444;">Failed to connect to backend server.</span>';
+            } finally {
+                analyzeBtn.disabled = false;
+                analyzeBtn.innerText = 'Analyze & Log Symptoms';
+            }
+        }
+    </script>
+</body>
+</html>

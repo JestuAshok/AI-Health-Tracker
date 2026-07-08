@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Symptom Log | HealthAI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/glassmorphism.css">
+    <style>
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .nav-item {
+            padding: 1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .nav-item:hover, .nav-item.active {
+            background: rgba(216, 180, 254, 0.2);
+            color: var(--primary);
+        }
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+        
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+        .form-label {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+        }
+        .form-control {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            background: rgba(255, 255, 255, 0.5);
+            font-family: inherit;
+        }
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(216, 180, 254, 0.3);
+        }
+        .slider-container {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        input[type="range"] {
+            flex-grow: 1;
+            accent-color: var(--primary);
+        }
+    </style>
+</head>
+<body>
+    <nav class="glass-nav">
+        <div class="container" style="display:flex; justify-content:space-between; align-items:center; padding: 1rem 2rem;">
+            <div style="font-weight:700; font-size:1.25rem; color: var(--primary);">HealthAI</div>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <span style="font-weight: 500;">John Doe</span>
+                <img src="https://ui-avatars.com/api/?name=John+Doe&background=D8B4FE&color=fff" alt="Profile" style="border-radius: 50%; width: 40px; height: 40px;">
+                <a href="index.html" style="font-size: 0.875rem; color: var(--text-light);">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="dashboard-grid">
+            <aside class="sidebar glass-card">
+                <a href="patient-dashboard.html" class="nav-item" style="text-decoration: none; color: inherit; display: block;">Overview</a>
+                <a href="symptom-log.html" class="nav-item active" style="text-decoration: none; color: inherit; display: block;">Symptom Log</a>
+                <a href="voice-logger.html" class="nav-item" style="text-decoration: none; color: inherit; display: block;">Voice Logger</a>
+                <a href="health-reports.html" class="nav-item" style="text-decoration: none; color: inherit; display: block;">Health Reports</a>
+                <a href="appointments.html" class="nav-item" style="text-decoration: none; color: inherit; display: block;">Appointments</a>
+            </aside>
+            
+            <main class="main-content">
+                <div class="glass-card">
+                    <h2 style="margin-top: 0; margin-bottom: 1.5rem; color: var(--primary);">Daily Symptom Log</h2>
+                    <p style="color: var(--text-light); margin-bottom: 2rem;">Please accurately log your symptoms to help our AI track your health progression.</p>
+                    
+                    <div id="progressAlert" style="display:none; padding: 1rem; margin-bottom: 1.5rem; border-radius: 8px; font-weight: 500; background: rgba(167, 243, 208, 0.4); color: #059669;"></div>
+                    <form id="symptomForm" onsubmit="submitForm(event)">
+                        <div class="form-group">
+                            <label class="form-label" for="temperature">Body Temperature (°F)</label>
+                            <input type="number" id="temperature" class="form-control" step="0.1" placeholder="e.g. 98.6" required>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="fatigue">Fatigue Level (1-10)</label>
+                            <div class="slider-container">
+                                <span>1 (None)</span>
+                                <input type="range" id="fatigue" min="1" max="10" value="1" oninput="document.getElementById('fatigueVal').innerText = this.value">
+                                <span>10 (Severe)</span>
+                            </div>
+                            <div style="text-align: center; margin-top: 0.5rem; font-weight: 600;" id="fatigueVal">1</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="pain">Pain Severity (1-10)</label>
+                            <div class="slider-container">
+                                <span>1 (None)</span>
+                                <input type="range" id="pain" min="1" max="10" value="1" oninput="document.getElementById('painVal').innerText = this.value">
+                                <span>10 (Severe)</span>
+                            </div>
+                            <div style="text-align: center; margin-top: 0.5rem; font-weight: 600;" id="painVal">1</div>
+                        </div>
+
+                        <div class="form-group">
+                            <label class="form-label" for="sleep">Sleep Quality</label>
+                            <select id="sleep" class="form-control">
+                                <option value="good">Good (7+ hours, uninterrupted)</option>
+                                <option value="fair">Fair (5-7 hours, minor interruptions)</option>
+                                <option value="poor">Poor (Under 5 hours, heavily interrupted)</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label" for="notes">Additional Notes</label>
+                            <textarea id="notes" class="form-control" rows="4" placeholder="Describe any new symptoms or changes..."></textarea>
+                        </div>
+
+                        <button type="submit" class="btn btn-primary" style="width: 100%; padding: 1rem; font-size: 1rem; font-weight: 600;">Check Health Progress</button>
+                    </form>
+                </div>
+            </main>
+        </div>
+    </div>
+    <script>
+        const API_BASE_URL = localStorage.getItem('API_URL') || (window.location.origin.includes(':3000') ? 'http://localhost:8000' : window.location.origin);
+
+        async function submitForm(event) {
+            event.preventDefault();
+            const btn = event.target.querySelector('button[type="submit"]');
+            btn.innerText = 'Checking...';
+            btn.disabled = true;
+
+            const data = {
+                temperature: parseFloat(document.getElementById('temperature').value),
+                fatigue_level: parseInt(document.getElementById('fatigue').value),
+                pain_level: parseInt(document.getElementById('pain').value),
+                sleep_quality: 5,
+                cough_severity: 'none',
+                breathing_difficulty: 'none',
+                headache_severity: 'none',
+                mood_score: 5,
+                stress_level: 5,
+                appetite: 'normal',
+                energy_level: 5,
+                notes: document.getElementById('notes').value,
+                submission_method: 'manual'
+            };
+
+            try {
+                // Mocking patient ID 1
+                const res = await fetch(`${API_BASE_URL}/api/submit-symptoms/1`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(data)
+                });
+                const result = await res.json();
+                
+                const alertBox = document.getElementById('progressAlert');
+                alertBox.innerText = result.progress_message;
+                alertBox.style.display = 'block';
+                
+                btn.innerText = 'Compared!';
+                // Remove redirect so the user can read the message
+                btn.disabled = false;
+            } catch(err) {
+                alert('Failed to check symptoms. Is the backend running?');
+                btn.innerText = 'Check Health Progress';
+                btn.disabled = false;
+            }
+        }
+    </script>
+</body>
+</html>

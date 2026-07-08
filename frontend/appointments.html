@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Appointments | HealthAI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/glassmorphism.css">
+    <style>
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+        .nav-item {
+            padding: 1rem;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+        .nav-item:hover, .nav-item.active {
+            background: rgba(216, 180, 254, 0.2);
+            color: var(--primary);
+        }
+        .main-content {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+        .appointment-card {
+            background: rgba(255, 255, 255, 0.6);
+            border-left: 4px solid var(--primary);
+            border-radius: 8px;
+            padding: 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+        .appointment-info h4 {
+            margin: 0 0 0.25rem 0;
+            color: var(--text-dark);
+            font-size: 1.1rem;
+        }
+        .appointment-info p {
+            margin: 0;
+            color: var(--text-light);
+            font-size: 0.875rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 1000; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgba(0,0,0,0.4); 
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 10% auto; 
+            padding: 2rem;
+            border: 1px solid #888;
+            border-radius: 12px;
+            width: 80%;
+            max-width: 500px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        .form-group input, .form-group select {
+            width: 100%;
+            padding: 0.5rem;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-family: inherit;
+        }
+    </style>
+</head>
+<body>
+    <nav class="glass-nav">
+        <div class="container" style="display:flex; justify-content:space-between; align-items:center; padding: 1rem 2rem;">
+            <div style="font-weight:700; font-size:1.25rem; color: var(--primary);">HealthAI</div>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <span style="font-weight: 500;">John Doe</span>
+                <img src="https://ui-avatars.com/api/?name=John+Doe&background=D8B4FE&color=fff" alt="Profile" style="border-radius: 50%; width: 40px; height: 40px;">
+                <a href="index.html" style="font-size: 0.875rem; color: var(--text-light);">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="dashboard-grid">
+            <aside class="sidebar glass-card">
+                <a href="patient-dashboard.html" class="nav-item" style="text-decoration: none; color: inherit; display: block;">Overview</a>
+                <a href="symptom-log.html" class="nav-item" style="text-decoration: none; color: inherit; display: block;">Symptom Log</a>
+                <a href="voice-logger.html" class="nav-item" style="text-decoration: none; color: inherit; display: block;">Voice Logger</a>
+                <a href="health-reports.html" class="nav-item" style="text-decoration: none; color: inherit; display: block;">Health Reports</a>
+                <a href="appointments.html" class="nav-item active" style="text-decoration: none; color: inherit; display: block;">Appointments</a>
+            </aside>
+            
+            <main class="main-content">
+                <div class="glass-card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                        <div>
+                            <h2 style="margin: 0; color: var(--primary);">Upcoming Appointments</h2>
+                            <p style="color: var(--text-light); margin: 0.5rem 0 0 0;">Manage your doctor visits and tele-consultations.</p>
+                        </div>
+                        <button class="btn btn-primary" id="openModalBtn">Schedule New</button>
+                    </div>
+                    
+                    <div id="appointmentsList">
+                        <!-- Appointments will be rendered here dynamically -->
+                        <p style="text-align: center; color: var(--text-light);">Loading appointments...</p>
+                    </div>
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- The Modal -->
+    <div id="scheduleModal" class="modal">
+      <div class="modal-content">
+        <span class="close">&times;</span>
+        <h2 style="margin-top: 0; color: var(--primary);">Schedule Appointment</h2>
+        <form id="scheduleForm">
+            <div class="form-group">
+                <label for="doctor_id">Doctor</label>
+                <select id="doctor_id" required>
+                    <option value="1">Dr. Smith (General Practitioner)</option>
+                    <option value="2">Dr. Adams (Cardiologist)</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label for="date_time">Date & Time</label>
+                <input type="datetime-local" id="date_time" required>
+            </div>
+            <div class="form-group">
+                <label for="purpose">Purpose</label>
+                <input type="text" id="purpose" placeholder="e.g. Routine Checkup" required>
+            </div>
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 1rem;">Confirm Appointment</button>
+        </form>
+      </div>
+    </div>
+
+    <script>
+        const API_BASE_URL = localStorage.getItem('API_URL') || (window.location.origin.includes(':3000') ? 'http://localhost:8000' : window.location.origin);
+        const API_URL = `${API_BASE_URL}/api/appointments/1`; // Hardcoded patient ID 1
+        
+        // Modal logic
+        const modal = document.getElementById("scheduleModal");
+        const btn = document.getElementById("openModalBtn");
+        const span = document.getElementsByClassName("close")[0];
+
+        btn.onclick = function() {
+          modal.style.display = "block";
+        }
+
+        span.onclick = function() {
+          modal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+          if (event.target == modal) {
+            modal.style.display = "none";
+          }
+        }
+
+        // Fetch and display appointments
+        async function fetchAppointments() {
+            try {
+                const response = await fetch(API_URL);
+                if (!response.ok) throw new Error('Failed to fetch appointments');
+                const appointments = await response.json();
+                
+                const list = document.getElementById('appointmentsList');
+                list.innerHTML = '';
+                
+                if (appointments.length === 0) {
+                    list.innerHTML = '<p style="text-align: center; color: var(--text-light);">No upcoming appointments scheduled.</p>';
+                    return;
+                }
+
+                appointments.forEach(app => {
+                    const dateObj = new Date(app.date_time);
+                    const formattedDate = dateObj.toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' });
+                    const docName = app.doctor_id == 1 ? "Dr. Smith" : "Dr. Adams";
+                    
+                    const card = document.createElement('div');
+                    card.className = 'appointment-card';
+                    card.innerHTML = `
+                        <div class="appointment-info">
+                            <h4>Appointment with ${docName}</h4>
+                            <p>
+                                <span style="font-weight:600; color:var(--text-dark);">📅 Time:</span> ${formattedDate}
+                            </p>
+                            <p>
+                                <span style="font-weight:600; color:var(--text-dark);">📍 Place:</span> ${docName.includes('Smith') ? 'Main Clinic, Room 101' : 'Heart Center, 2nd Floor'}
+                            </p>
+                            <p>
+                                <span style="font-weight:600; color:var(--text-dark);">📝 Purpose:</span> ${app.purpose}
+                            </p>
+                            <p style="margin-top: 0.75rem; color: #10B981; font-weight: 600; display:flex; align-items:center; gap:0.25rem;">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
+                                Status: ${app.status || 'Done / Booked'}
+                            </p>
+                        </div>
+                        <button class="btn btn-primary" style="background: transparent; color: var(--primary); border: 1px solid var(--primary);" onclick="alert('Viewing details...')">Details</button>
+                    `;
+                    list.appendChild(card);
+                });
+            } catch (error) {
+                console.error(error);
+                document.getElementById('appointmentsList').innerHTML = '<p style="text-align: center; color: red;">Error loading appointments. Is backend running?</p>';
+            }
+        }
+
+        // Handle form submission
+        document.getElementById('scheduleForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.innerText = 'Scheduling...';
+            btn.disabled = true;
+
+            const newApp = {
+                doctor_id: parseInt(document.getElementById('doctor_id').value),
+                date_time: new Date(document.getElementById('date_time').value).toISOString(),
+                purpose: document.getElementById('purpose').value,
+                status: 'SCHEDULED'
+            };
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(newApp)
+                });
+
+                if (!response.ok) throw new Error('Failed to schedule appointment');
+                
+                // Hide modal and refresh list
+                modal.style.display = "none";
+                e.target.reset();
+                await fetchAppointments();
+            } catch (error) {
+                console.error(error);
+                alert('Error scheduling appointment.');
+            } finally {
+                btn.innerText = 'Confirm Appointment';
+                btn.disabled = false;
+            }
+        });
+
+        // Initial fetch
+        fetchAppointments();
+    </script>
+</body>
+</html>

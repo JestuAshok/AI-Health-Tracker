@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Doctor Dashboard | HealthAI</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="css/glassmorphism.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+        }
+        .stat-card {
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), #C084FC);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        .stat-label {
+            color: var(--text-light);
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+        .patient-list {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .patient-list th, .patient-list td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+        .patient-list th {
+            font-weight: 600;
+            color: var(--text-light);
+            font-size: 0.875rem;
+        }
+        .badge {
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        .badge-critical { background: rgba(252, 165, 165, 0.3); color: #DC2626; }
+        .badge-medium { background: rgba(253, 186, 116, 0.3); color: #D97706; }
+        .badge-low { background: rgba(167, 243, 208, 0.4); color: #059669; }
+    </style>
+</head>
+<body>
+    <nav class="glass-nav">
+        <div class="container" style="display:flex; justify-content:space-between; align-items:center; padding: 1rem 2rem;">
+            <div style="font-weight:700; font-size:1.25rem; color: var(--primary);">HealthAI <span style="font-size: 0.875rem; color: var(--text-light); font-weight: normal;">| Doctor Portal</span></div>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <span style="font-weight: 500;">Dr. Smith</span>
+                <img src="https://ui-avatars.com/api/?name=Dr+Smith&background=A7F3D0&color=000" alt="Profile" style="border-radius: 50%; width: 40px; height: 40px;">
+                <a href="index.html" style="font-size: 0.875rem; color: var(--text-light);">Logout</a>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="dashboard-grid">
+            
+            <div class="stats-grid">
+                <div class="glass-card stat-card" style="cursor: pointer;" onclick="loadAllPatients()">
+                    <div class="stat-value">124</div>
+                    <div class="stat-label">Total Patients</div>
+                </div>
+                <div class="glass-card stat-card" style="cursor: pointer;" onclick="alert('Filtering by Critical Alerts...'); document.querySelector('.patient-list').scrollIntoView({behavior: 'smooth'})">
+                    <div class="stat-value" style="background: linear-gradient(135deg, #FCA5A5, #EF4444); -webkit-background-clip: text;">3</div>
+                    <div class="stat-label">Critical Alerts</div>
+                </div>
+                <div class="glass-card stat-card" style="cursor: pointer;" onclick="alert('Showing pending AI reports...')">
+                    <div class="stat-value">18</div>
+                    <div class="stat-label">Pending AI Reports</div>
+                </div>
+            </div>
+
+            <div class="glass-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                    <h3 style="margin: 0;">Patient Risk Overview</h3>
+                    <input type="text" placeholder="Search patients..." style="padding: 0.5rem 1rem; border-radius: 8px; border: 1px solid #ddd; width: 250px;">
+                </div>
+                <div style="overflow-x: auto;">
+                    <table class="patient-list">
+                        <thead>
+                            <tr>
+                                <th>Patient Name</th>
+                                <th>Age / Gender</th>
+                                <th>Latest Recovery Score</th>
+                                <th>AI Risk Assessment</th>
+                                <th>Trend Alert</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody id="patientTableBody">
+                            <tr>
+                                <td style="font-weight: 500;">John Doe</td>
+                                <td>45 / M</td>
+                                <td><strong>58</strong>/100</td>
+                                <td><span class="badge badge-critical">HIGH RISK</span></td>
+                                <td style="color: #DC2626; font-size: 0.875rem;">↗ Fever & Pain rising over 5 days</td>
+                                <td><button class="btn btn-primary" style="padding: 0.25rem 0.75rem; font-size: 0.75rem;" onclick="window.location.href='patient-dashboard.html'">View Profile</button></td>
+                            </tr>
+                            <tr>
+                                <td style="font-weight: 500;">Sarah Connor</td>
+                                <td>32 / F</td>
+                                <td><strong>72</strong>/100</td>
+                                <td><span class="badge badge-medium">MEDIUM RISK</span></td>
+                                <td style="color: #D97706; font-size: 0.875rem;">→ Stable but poor sleep</td>
+                                <td><button class="btn btn-primary" style="padding: 0.25rem 0.75rem; font-size: 0.75rem; background: #ddd; color: #333;" onclick="window.location.href='patient-dashboard.html'">View Profile</button></td>
+                            </tr>
+                            <tr>
+                                <td style="font-weight: 500;">Michael Chen</td>
+                                <td>58 / M</td>
+                                <td><strong>91</strong>/100</td>
+                                <td><span class="badge badge-low">LOW RISK</span></td>
+                                <td style="color: #059669; font-size: 0.875rem;">↘ Fatigue decreasing</td>
+                                <td><button class="btn btn-primary" style="padding: 0.25rem 0.75rem; font-size: 0.75rem; background: #ddd; color: #333;" onclick="window.location.href='patient-dashboard.html'">View Profile</button></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="glass-card" style="display: grid; grid-template-columns: 1fr 1fr; gap: 2rem;">
+                <div>
+                    <h3 style="margin-bottom: 1rem; font-size: 1rem;">Risk Distribution</h3>
+                    <div style="position: relative; height: 250px;">
+                        <canvas id="riskChart"></canvas>
+                    </div>
+                </div>
+                <div>
+                    <h3 style="margin-bottom: 1rem; font-size: 1rem;">Recent AI Summary (John Doe)</h3>
+                    <div style="background: rgba(255,255,255,0.5); padding: 1rem; border-radius: 12px; font-size: 0.9rem; line-height: 1.6;">
+                        <p>"Over the last 7 days, the patient's fever increased from 99°F to 103°F. Pain severity increased from 4 to 8 while sleep quality decreased by 35%. Recovery score dropped from 84 to 58. The overall health trend indicates worsening symptoms and medical consultation is strongly recommended."</p>
+                        <button class="btn btn-primary" style="margin-top: 1rem; width: 100%;">Schedule WhatsApp Alert & Appointment</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card" style="margin-top: 2rem;">
+                <h3 style="margin-bottom: 1.5rem; font-size: 1.1rem;">Detailed Patient Records & Symptom Logs</h3>
+                <div style="overflow-x: auto;">
+                    <table class="patient-list" style="width: 100%; text-align: left;">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Patient Name</th>
+                                <th>Temperature (°F)</th>
+                                <th>Fatigue (1-10)</th>
+                                <th>Pain (1-10)</th>
+                                <th>Sleep Quality</th>
+                                <th>Notes</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>Oct 17, 2026</td>
+                                <td style="font-weight: 500;">John Doe</td>
+                                <td>103.2</td>
+                                <td>8</td>
+                                <td>8</td>
+                                <td>Poor</td>
+                                <td style="color: var(--text-light); font-size: 0.875rem;">Fever spiked again. Woke up sweating multiple times.</td>
+                            </tr>
+                            <tr>
+                                <td>Oct 17, 2026</td>
+                                <td style="font-weight: 500;">Sarah Connor</td>
+                                <td>98.8</td>
+                                <td>6</td>
+                                <td>3</td>
+                                <td>Fair</td>
+                                <td style="color: var(--text-light); font-size: 0.875rem;">Feeling a bit better, but still tired.</td>
+                            </tr>
+                            <tr>
+                                <td>Oct 16, 2026</td>
+                                <td style="font-weight: 500;">Michael Chen</td>
+                                <td>98.6</td>
+                                <td>2</td>
+                                <td>1</td>
+                                <td>Good</td>
+                                <td style="color: var(--text-light); font-size: 0.875rem;">Slept well. Energy levels back to normal.</td>
+                            </tr>
+                            <tr>
+                                <td>Oct 16, 2026</td>
+                                <td style="font-weight: 500;">John Doe</td>
+                                <td>102.5</td>
+                                <td>7</td>
+                                <td>6</td>
+                                <td>Poor</td>
+                                <td style="color: var(--text-light); font-size: 0.875rem;">Chills and body aches.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            
+
+        </div>
+    </div>
+
+    <script>
+        const ctx = document.getElementById('riskChart').getContext('2d');
+        new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Low Risk', 'Medium Risk', 'High Risk', 'Critical'],
+                datasets: [{
+                    data: [85, 25, 10, 4],
+                    backgroundColor: [
+                        '#A7F3D0', // Mint
+                        '#FDBA74', // Soft Orange
+                        '#FCA5A5', // Coral
+                        '#DC2626'  // Red
+                    ],
+                    borderWidth: 0,
+                    hoverOffset: 4
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: {
+                    legend: { position: 'right' }
+                }
+            }
+        });
+
+        function loadAllPatients() {
+            const tbody = document.getElementById('patientTableBody');
+            const originalRows = tbody.innerHTML; // Keep the original 3 rows
+            let newRows = originalRows;
+            
+            const firstNames = ['James', 'Mary', 'Robert', 'Patricia', 'John', 'Jennifer', 'Michael', 'Linda', 'David', 'Elizabeth', 'William', 'Barbara', 'Richard', 'Susan', 'Joseph', 'Jessica'];
+            const lastNames = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Garcia', 'Miller', 'Davis', 'Rodriguez', 'Martinez', 'Hernandez', 'Lopez', 'Gonzalez', 'Wilson'];
+            const genders = ['M', 'F'];
+            const badges = [
+                { class: 'badge-low', text: 'LOW RISK', trend: '↘ Stable or improving', color: '#059669' },
+                { class: 'badge-medium', text: 'MEDIUM RISK', trend: '→ Minor symptoms noted', color: '#D97706' },
+                { class: 'badge-medium', text: 'MEDIUM RISK', trend: '→ Fluctuating fatigue', color: '#D97706' },
+                { class: 'badge-low', text: 'LOW RISK', trend: '↘ No symptoms reported', color: '#059669' }
+            ];
+
+            // Generate 121 more rows to make 124
+            for (let i = 0; i < 121; i++) {
+                const fName = firstNames[Math.floor(Math.random() * firstNames.length)];
+                const lName = lastNames[Math.floor(Math.random() * lastNames.length)];
+                const age = Math.floor(Math.random() * 60) + 20;
+                const gender = genders[Math.floor(Math.random() * genders.length)];
+                const score = Math.floor(Math.random() * 30) + 65; // Mostly 65-95
+                const badge = badges[Math.floor(Math.random() * badges.length)];
+                
+                newRows += `
+                    <tr>
+                        <td style="font-weight: 500;">${fName} ${lName}</td>
+                        <td>${age} / ${gender}</td>
+                        <td><strong>${score}</strong>/100</td>
+                        <td><span class="badge ${badge.class}">${badge.text}</span></td>
+                        <td style="color: ${badge.color}; font-size: 0.875rem;">${badge.trend}</td>
+                        <td><button class="btn btn-primary" style="padding: 0.25rem 0.75rem; font-size: 0.75rem; background: #ddd; color: #333;" onclick="window.location.href='patient-dashboard.html'">View Profile</button></td>
+                    </tr>
+                `;
+            }
+            
+            tbody.innerHTML = newRows;
+            document.querySelector('.patient-list').scrollIntoView({behavior: 'smooth'});
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,90 @@
+:root {
+  --primary: #1E293B;
+  --secondary: #A7F3D0;
+  --accent: #FDBA74;
+  --highlight: #FCA5A5;
+  --background: #FFFDF7;
+  --text-dark: #1F2937;
+  --text-light: #4B5563;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-weight: 500;
+  background-color: var(--background);
+  color: var(--text-dark);
+  min-height: 100vh;
+  background-image: 
+    radial-gradient(at 40% 20%, hsla(28,100%,74%,0.2) 0px, transparent 50%),
+    radial-gradient(at 80% 0%, hsla(189,100%,56%,0.2) 0px, transparent 50%),
+    radial-gradient(at 0% 50%, hsla(355,100%,93%,0.2) 0px, transparent 50%);
+  background-attachment: fixed;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 700;
+  margin-top: 0;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+/* Base Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.75rem 1.5rem;
+  font-weight: 500;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, var(--primary), #C084FC);
+  color: white;
+  box-shadow: 0 4px 6px -1px rgba(216, 180, 254, 0.4);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 15px -3px rgba(216, 180, 254, 0.5);
+}
+
+.grid {
+  display: grid;
+  gap: 1.5rem;
+}
+
+/* Ensure all elements with light text are bold and clearly visible */
+.stat-label,
+[style*="color: var(--text-light)"],
+::placeholder {
+  font-weight: 700 !important;
+}
+
+/* Ensure all primary/pink/purple/highlight text is bold and uses high-contrast colors */
+.nav-item.active,
+.nav-item:hover,
+[style*="color: var(--primary)"] {
+  color: #1E293B !important; /* Dark Slate / Charcoal */
+  font-weight: 800 !important; /* Extra Bold */
+}
+
+.stat-value,
+.badge-critical,
+[style*="color: var(--highlight)"],
+[style*="color: #C084FC"] {
+  font-weight: 800 !important;
+}
